@@ -15,4 +15,13 @@
             <span class="label-text-alt text-error">{{ $message }}</span>
         </div>
     @enderror
+
+    @if ($type === 'password')
+        <div class="label">
+            <span class="label-text-alt text-gray-500">
+                La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo.
+            </span>
+        </div>
+    @endif
+    
 </label>
