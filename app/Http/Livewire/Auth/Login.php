@@ -16,9 +16,9 @@ class Login extends Component
     public $recaptcha;
 
     protected $rules = [
-        'email' => 'required|email:rfc,dns|max:50|exists:users,email',// Verifica que el email exista en la tabla users
-        'password' => 'required|string|min:8|max:30|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/',// Verifica que la contraseña contenga al menos una letra minúscula, una letra mayúscula, un número y un caracter especial
-        'recaptcha' => 'required',// Verifica que el recaptcha no esté vacío
+        'email' => 'required|email:rfc,dns|max:50|exists:users,email',
+        'password' => 'required|string|min:8|max:30|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/',
+        'recaptcha' => 'required',
     ];  
 
     protected $listeners = [

@@ -19,7 +19,7 @@
     @if ($type === 'password')
         <div class="label">
             <span class="label-text-alt text-gray-500">
-                La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo.
+            The password must be at least 8 characters long, one uppercase letter, one lowercase letter, one number, and one symbol.
             </span>
         </div>
     @endif
