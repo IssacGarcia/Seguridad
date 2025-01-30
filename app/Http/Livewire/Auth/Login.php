@@ -16,7 +16,7 @@ class Login extends Component
     public $recaptcha;
 
     protected $rules = [
-        'email' => 'required|email|max:255|exists:users,email',
+        'email' => 'required|email|max:50|exists:users,email',
         'password' => 'required|string|min:8|max:30',
         'recaptcha' => 'required',
     ];

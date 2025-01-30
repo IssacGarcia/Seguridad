@@ -18,7 +18,7 @@ class TwoFactor
     public function handle(Request $request, Closure $next)
     {
         if (session()->has('code')) {
-            if (Carbon::now()->gte(session('expires_at'))) {
+            if (now() > session('expires_at')) {
                 session()->forget(['email', 'code', 'expires_at']);
                 return redirect()->route('login');
             } else if (

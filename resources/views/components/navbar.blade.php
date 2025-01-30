@@ -1,6 +1,6 @@
 <div class="navbar h-16 bg-base-300">
     <div class="flex-1">
-        <a class="btn btn-ghost text-xl">{{ config('app.name') }}</a>
+        <a href="{{ route('index') }}" class="btn btn-ghost text-xl">{{ config('app.name') }}</a>
     </div>
     <div class="flex-none gap-2">
         @auth
