@@ -16,8 +16,8 @@ class Register extends Component
     protected $rules = [
         'name' => 'required|string|max:255',
         'email' => 'required|string|email|max:255|unique:users',
-        'password' => 'required|string|min:8',
-        'password_confirmation' => 'required|string|min:8|same:password',
+        'password' => 'required|string|min:8|max:30',
+        'password_confirmation' => 'required|string|min:8|max:30|same:password',
     ];
 
     public function render()

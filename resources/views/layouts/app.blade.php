@@ -23,5 +23,13 @@
                 alert(event.detail.message);
             });
         </script>
+
+        <!-- reCAPTCHA v2 Script -->
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+        <script>
+            function recaptchaVerified(response) {
+                Livewire.emit('recaptchaVerified' , response);
+            }
+        </script>
     </body>
 </html>

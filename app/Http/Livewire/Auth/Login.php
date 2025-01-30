@@ -7,20 +7,49 @@ use Illuminate\Support\Carbon;
 use App\Mail\TwoFactorCodeMail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Http;
 
 class Login extends Component
 {
     public $email;
     public $password;
+    public $recaptcha;
 
     protected $rules = [
-        'email' => 'required|email',
-        'password' => 'required',
+        'email' => 'required|email|max:255|exists:users,email',
+        'password' => 'required|string|min:8|max:30',
+        'recaptcha' => 'required',
     ];
+
+    protected $listeners = [
+        'recaptchaVerified'
+    ];
+
+    public function recaptchaVerified($response)
+    {
+        $this->recaptcha = $response;
+        $this->resetErrorBag('recaptcha');
+    }
 
     public function login()
     {
         $this->validate();
+
+        if (!session()->has('recaptcha') || now() > session('recaptcha')) {
+
+            // Verify the reCAPTCHA for Google
+            $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+                'secret' => config('services.recaptcha.secret_key'),
+                'response' => $this->recaptcha,
+            ]);
+
+            if (!$response->json('success')) {
+                $this->addError('recaptcha', 'The reCAPTCHA verification failed. Please try again.');
+                return;
+            }
+
+            session(['recaptcha' => now()->addMinutes(2)]);
+        }
 
         // Validate the credentials
         if (auth()->validate([
@@ -28,11 +57,14 @@ class Login extends Component
             'password' => $this->password,
         ])) {
 
+            // Remove the recaptcha session
+            session()->forget('recaptcha');
+
             // Generate the OTP and store it in the session
             session([
                 'email' => $this->email,
                 'code' => rand(100000, 999999),
-                'expires_at' => Carbon::now()->addMinutes(1),
+                'expires_at' => Carbon::now()->addMinutes(3),
             ]);
 
             // Send the email and redirect to the OTP page
