@@ -14,7 +14,7 @@ class Register extends Component
     public $password_confirmation;
 
     protected $rules = [
-        'name' => 'required|string|regex:/^[\pL\s\-]+$/u|max:255', // Solo permite letras, espacios y guiones
+        'name' => 'required|string|regex:/^[\pL\s\-]+$/u|min:8|max:255', // Solo permite letras, espacios y guiones
         'email' => 'required|string|email:rfc,dns|max:255|unique:users', // Verifica que el email sea único en la tabla users
         'password' => 'required|string|min:8|max:30|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/',// Verifica que la contraseña contenga al menos una letra minúscula, una letra mayúscula, un número y un caracter especial
         'password_confirmation' => 'required|string|min:8|max:30|same:password',// Verifica que la confirmación de la contraseña sea igual a la contraseña
