@@ -17,18 +17,21 @@ class TwoFactor
      */
     public function handle(Request $request, Closure $next)
     {
+        // Check if the session has the code
         if (session()->has('code')) {
             if (now() > session('expires_at')) {
                 session()->forget(['email', 'code', 'expires_at']);
-                return redirect()->route('login');
+                return redirect()->route('login');//if the code has expired
+
+                //
             } else if (
-                $request->route()->getName() === 'login' ||
-                $request->route()->getName() === 'register'
+                $request->route()->getName() === 'login' ||//if the user is already logged in
+                $request->route()->getName() === 'register'//if the user is already registered
             ) {
-                return redirect()->route('two_factor');
+                return redirect()->route('two_factor');//redirect to the two-factor authentication page
             }
         } else if ($request->route()->getName() === 'two_factor') {
-            return redirect()->route('login');
+            return redirect()->route('login');//if the user is not logged in
         }
 
         return $next($request);

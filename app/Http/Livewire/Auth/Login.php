@@ -15,26 +15,28 @@ class Login extends Component
     public $password;
     public $recaptcha;
 
+    //rules for validation
     protected $rules = [
-        'email' => 'required|email:rfc,dns|max:50|exists:users,email',
-        'password' => 'required|string|min:8|max:30|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/',
-        'recaptcha' => 'required',
+        'email' => 'required|email:rfc,dns|max:50|exists:users,email', //check if email exists in the database
+        'password' => 'required|string|min:8|max:30|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/',//password must contain at least one uppercase, one lowercase, one number and one special character
+        'recaptcha' => 'required',//recaptcha is required
     ];  
 
+    //listeners for recaptcha
     protected $listeners = [
         'recaptchaVerified'
     ];
-
+    //function to verify recaptcha
     public function recaptchaVerified($response)
     {
         $this->recaptcha = $response;
         $this->resetErrorBag('recaptcha');
     }
-
+    //function to login
     public function login()
     {
         $this->validate();
-
+        //check if recaptcha is valid
         if (!session()->has('recaptcha') || now() > session('recaptcha')) {
 
             // Verify the reCAPTCHA for Google
@@ -42,12 +44,12 @@ class Login extends Component
                 'secret' => config('services.recaptcha.secret_key'),
                 'response' => $this->recaptcha,
             ]);
-
+            //if recaptcha verification fails
             if (!$response->json('success')) {
                 $this->addError('recaptcha', 'The reCAPTCHA verification failed. Please try again.');
                 return;
             }
-
+            //store recaptcha in session
             session(['recaptcha' => now()->addMinutes(2)]);
         }
 
@@ -70,8 +72,11 @@ class Login extends Component
             // Send the email and redirect to the OTP page
             Mail::to($this->email)->send(new TwoFactorCodeMail(session('code')));
             return redirect()->route('two_factor');
+        
 
+        
         } else {
+            //if email or password is wrong
             $this->dispatchBrowserEvent('alert', ['message' => 'Wrong email or password.']);
         }
     }

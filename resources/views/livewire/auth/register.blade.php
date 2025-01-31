@@ -9,6 +9,17 @@
                 <x-input for="password" type="password" label="Password" />
                 <x-input for="password_confirmation" type="password" label="Confirm Password" />
 
+                <div class="mt-4">
+                    <div class="g-recaptcha" 
+                        data-sitekey="{{ config('services.recaptcha.site_key') }}" 
+                        data-callback="recaptchaVerified" wire:ignore></div>
+                    @error('recaptcha')
+                        <div class="label">
+                            <span class="label-text-alt text-error">{{ $message }}</span>
+                        </div>
+                    @enderror
+                </div>
+
                 <div class="card-actions mt-4 justify-end">
                     <button type="submit" class="btn btn-primary">Register</button>
                 </div>
