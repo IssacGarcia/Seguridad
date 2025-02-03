@@ -1,9 +1,9 @@
 <?php
 
-use App\Http\Livewire\Auth\Login;
-use App\Http\Livewire\Auth\Register;
-use App\Http\Livewire\Auth\TwoFactor;
 use App\Http\Livewire\Home;
+use App\Http\Livewire\Auth\Login;
+use App\Http\Controllers\SignedUrl;
+use App\Http\Livewire\Auth\Register;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,11 +18,11 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', Home::class)->name('index');
+Route::get('signed-url', SignedUrl::class)->middleware('signed')->name('signed-url');
 
-Route::middleware(['guest', 'two_factor'])->group(function () {
+Route::middleware('guest')->group(function () {
     Route::get('/login', Login::class)->name('login');
     Route::get('/register', Register::class)->name('register');
-    Route::get('/two_factor', TwoFactor::class)->name('two_factor');
 });
 
 Route::post('/logout', function () {

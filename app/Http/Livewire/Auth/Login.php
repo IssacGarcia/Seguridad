@@ -2,10 +2,9 @@
 
 namespace App\Http\Livewire\Auth;
 
+use App\Http\Controllers\SignedUrl;
+use App\Mail\SignedLoginMail;
 use Livewire\Component;
-use Illuminate\Support\Carbon;
-use App\Mail\TwoFactorCodeMail;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Http;
 
@@ -20,7 +19,7 @@ class Login extends Component
         'email' => 'required|email:rfc,dns|max:50|exists:users,email', //check if email exists in the database
         'password' => 'required|string|min:8|max:30|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/',//password must contain at least one uppercase, one lowercase, one number and one special character
         'recaptcha' => 'required',//recaptcha is required
-    ];  
+    ];
 
     //listeners for recaptcha
     protected $listeners = [
@@ -62,19 +61,13 @@ class Login extends Component
             // Remove the recaptcha session
             session()->forget('recaptcha');
 
-            // Generate the OTP and store it in the session
-            session([
-                'email' => $this->email,
-                'code' => rand(100000, 999999),
-                'expires_at' => Carbon::now()->addMinutes(3),
-            ]);
-
             // Send the email and redirect to the OTP page
-            Mail::to($this->email)->send(new TwoFactorCodeMail(session('code')));
-            return redirect()->route('two_factor');
-        
+            $url = SignedUrl::generate('login', ['email' => $this->email]);
+            Mail::to($this->email)->send(new SignedLoginMail($url));
 
-        
+            // Redirect to the user email
+            $domain = explode('@', $this->email)[1];
+            return redirect("https://$domain");
         } else {
             //if email or password is wrong
             $this->dispatchBrowserEvent('alert', ['message' => 'Wrong email or password.']);
