@@ -2,11 +2,15 @@
 
 namespace App\Http\Livewire\Auth;
 
-use App\Http\Controllers\SignedUrl;
-use App\Mail\SignedLoginMail;
+use URL;
+use Cache;
+use App\Models\OTPCode;
 use Livewire\Component;
-use Illuminate\Support\Facades\Mail;
+use App\Mail\SignedLoginMail;
+use App\Http\Controllers\SignedUrl;
+use App\Mail\TwoFactorCodeMail;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 
 class Login extends Component
 {
@@ -16,7 +20,7 @@ class Login extends Component
 
     //rules for validation
     protected $rules = [
-        'email' => 'required|email:rfc,dns|max:50|exists:users,email', //check if email exists in the database
+        'email' => 'required|email:rfc,dns|max:50', //check if email exists in the database
         'password' => 'required|string|min:8|max:30|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/',//password must contain at least one uppercase, one lowercase, one number and one special character
         'recaptcha' => 'required',//recaptcha is required
     ];
@@ -61,14 +65,16 @@ class Login extends Component
             // Remove the recaptcha session
             session()->forget('recaptcha');
 
-            // Send the email and redirect to the OTP page
-            $url = SignedUrl::generate('login', ['email' => $this->email]);
-            Mail::to($this->email)->send(new SignedLoginMail($url));
+            // signed url to login
+            $otp = OTPCode::createCode($this->email);
+            $url = URL::temporarySignedRoute('two_factor', now()->addMinutes(3), ['email' => $this->email]);
 
-            // Redirect to the user email
-            $domain = explode('@', $this->email)[1];
-            return redirect("https://$domain");
+            // Send the OTP to the user
+            Mail::to($this->email)->send(new TwoFactorCodeMail($otp->code));
+
+            return redirect($url);
         } else {
+
             //if email or password is wrong
             $this->dispatchBrowserEvent('alert', ['message' => 'Wrong email or password.']);
         }

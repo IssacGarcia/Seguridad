@@ -4,6 +4,7 @@ use App\Http\Livewire\Home;
 use App\Http\Livewire\Auth\Login;
 use App\Http\Controllers\SignedUrl;
 use App\Http\Livewire\Auth\Register;
+use App\Http\Livewire\Auth\TwoFactor;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -23,6 +24,7 @@ Route::get('signed-url', SignedUrl::class)->middleware('signed')->name('signed-u
 Route::middleware('guest')->group(function () {
     Route::get('/login', Login::class)->name('login');
     Route::get('/register', Register::class)->name('register');
+    Route::get('/two_factor', TwoFactor::class)->middleware('signed')->name('two_factor');
 });
 
 Route::post('/logout', function () {

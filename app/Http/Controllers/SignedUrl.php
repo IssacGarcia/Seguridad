@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Carbon;
 
 class SignedUrl extends Controller
 {
@@ -44,7 +45,7 @@ class SignedUrl extends Controller
     public static function generate(string $action, array $data): string
     {
         $data['action'] = $action;
-        $data['token'] = uniqid('signed-url');
+        $data['token'] = uniqid();
         return URL::temporarySignedRoute('signed-url', now()->addMinutes(3), $data);
     }
 
@@ -54,8 +55,8 @@ class SignedUrl extends Controller
     private function markUsed(Request $request): void
     {
         $token = $request->input('token');
-        $expires = $request->input('expires');
-        Cache::put('signed-url-'.$token, true, now()->diffInMinutes($expires));
+        $expires = Carbon::createFromTimestamp($request->input('expires'));
+        Cache::put('signed-url-'.$token, true, $expires);
     }
 
     /**
