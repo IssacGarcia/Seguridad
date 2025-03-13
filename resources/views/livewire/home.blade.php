@@ -14,7 +14,7 @@
             <div class="max-w-md">
                 <h1 class="text-5xl font-bold">{{ config('app.name') }}</h1>
                 <p class="py-6">
-                    By Cristo Issac Garcia Rivas
+                    By Cristo Issac Garcia Rivas V2
                 </p>
             </div>
         </div>
