@@ -16,6 +16,11 @@ class SessionIpBind
      */
     public function handle($request, Closure $next)
     {
+        // Exclude the login route and other authentication routes
+        if ($request->is('login') || $request->is('login*')) {
+            return $next($request);
+        }
+
         // Get the current IP address and User-Agent of the client
         $ip = $request->ip();
         $userAgent = $request->header('User-Agent');
